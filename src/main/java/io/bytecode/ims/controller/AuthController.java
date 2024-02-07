@@ -1,6 +1,9 @@
 package io.bytecode.ims.controller;
 
 
+import io.bytecode.ims.dto.AuthenticationResponse;
+import io.bytecode.ims.dto.LoginRequest;
+import io.bytecode.ims.dto.RefreshTokenRequest;
 import io.bytecode.ims.dto.UserDto;
 import io.bytecode.ims.service.AuthService;
 import jakarta.validation.Valid;
@@ -26,6 +29,16 @@ public class AuthController {
     public ResponseEntity<String> verifyAccount(@PathVariable String token) {
         authService.verifyAccount(token);
         return new ResponseEntity<>("Account activated successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
+        return authService.login(loginRequest);
+    }
+
+    @PostMapping("/refresh/token")
+    public AuthenticationResponse refreshTokens(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return authService.refreshToken(refreshTokenRequest);
     }
 
 }

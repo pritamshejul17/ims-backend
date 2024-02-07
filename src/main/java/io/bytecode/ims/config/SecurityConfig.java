@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,11 @@ import java.security.interfaces.RSAPublicKey;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Value("${jwt.public.key}")
+    RSAPublicKey publicKey;
+
+    @Value("${jwt.private.key}")
+    RSAPrivateKey privateKey;
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -51,8 +57,25 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+                )
                 .build();
     }
 
+    @Bean
+    JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(this.publicKey).build();
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder() {
+        JWK jwk = new RSAKey.Builder(this.publicKey).privateKey(this.privateKey).build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+        return new NimbusJwtEncoder(jwks);
+    }
 
 }

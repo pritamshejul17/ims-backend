@@ -1,6 +1,9 @@
 package io.bytecode.ims.service;
 
 
+import io.bytecode.ims.dto.AuthenticationResponse;
+import io.bytecode.ims.dto.LoginRequest;
+import io.bytecode.ims.dto.RefreshTokenRequest;
 import io.bytecode.ims.dto.UserDto;
 import io.bytecode.ims.exception.SpringImsException;
 import io.bytecode.ims.model.NotificationEmail;
@@ -8,6 +11,7 @@ import io.bytecode.ims.model.User;
 import io.bytecode.ims.model.VerifyToken;
 import io.bytecode.ims.respository.UserRepository;
 import io.bytecode.ims.respository.VerifyTokenRepository;
+import io.bytecode.ims.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,11 +35,10 @@ public class AuthService {
     private final MailService mailService;
     private final UserRepository userRepository;
 
-    /*
+
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
-     */
 
     public void signUp(UserDto userDto) {
 
@@ -78,7 +81,7 @@ public class AuthService {
         fetchUserAndEnable(verificationToken.orElseThrow(() -> new SpringImsException("Invalid Token")));
     }
 
-    /*
+
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                 loginRequest.getPassword()));
@@ -102,6 +105,5 @@ public class AuthService {
                 .username(refreshTokenRequest.getUsername())
                 .build();
     }
-     */
 }
 

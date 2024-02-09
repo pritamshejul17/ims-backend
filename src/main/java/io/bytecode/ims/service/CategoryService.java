@@ -18,12 +18,15 @@ public class CategoryService {
 
     private final S3Service s3Service;
 
+    private final AuthService authService;
+
     public String upload(MultipartFile imageFile, String name) throws  IOException {
         File file = convertMultiPartFileToFile(imageFile);
         String imageUrl = s3Service.uploadFile("ims-gallery", imageFile.getOriginalFilename(), file);
         Category category = new Category();
         category.setName(name);
         category.setImageUrl(imageUrl);
+        category.setUser(authService.getCurrentUser());
         categoryRepository.save(category);
         return imageUrl;
     }

@@ -3,7 +3,9 @@ package io.bytecode.ims.controller;
 import io.bytecode.ims.model.Category;
 import io.bytecode.ims.service.CategoryService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -19,10 +21,10 @@ public class CategoryController {
     @RequestMapping(value = "/upload",
             method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String uploadImageWithJson(@RequestPart("image") MultipartFile image,
-                                      @RequestParam("name") String name) throws IOException {
+    public ResponseEntity<String> uploadImageWithJson(@RequestPart("image") MultipartFile image,
+                                              @RequestParam("name") String name) throws IOException {
         String imageUrl = categoryService.upload(image, name);
-        return imageUrl;
+        return new ResponseEntity<>("Category has been added successfully", HttpStatus.CREATED);
     }
 
     @GetMapping("/all")
@@ -31,9 +33,9 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
-        return "Category has been deleted successfully";
+        return new ResponseEntity<>("Category has been deleted successfully", HttpStatus.OK);
     }
 
 }

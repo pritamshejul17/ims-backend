@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +46,20 @@ public class ProductService {
         fos.write(file.getBytes());
         fos.close();
         return convertedFile;
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    public void deleteById(Long id) {
+        Optional<Product> product = productRepository.findById(id);
+        productRepository.delete(product.orElseThrow(() -> new SpringImsException("Product Not found")));
+    }
+
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        Optional<Category> category = categoryRepository.findById(categoryId);
+
+        return productRepository.findAllByCategory(category.orElseThrow(() -> new SpringImsException("Category Not found")));
     }
 }

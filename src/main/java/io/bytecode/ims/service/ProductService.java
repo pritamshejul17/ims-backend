@@ -40,6 +40,22 @@ public class ProductService {
         return imageUrl;
     }
 
+    public String updateProduct(MultipartFile imageFile, ProductDto productDto, Long categoryId, Long productId) throws IOException {
+        Optional<Category> category = categoryRepository.findById(categoryId);
+        File file = convertMultiPartFileToFile(imageFile);
+        String imageUrl = s3Service.uploadFile("ims-gallery", imageFile.getOriginalFilename(), file);
+        Optional<Product> product = productRepository.findById(productId);
+        product.get().setCategory(category.orElseThrow(() -> new SpringImsException("Category Not found ")));
+        product.get().setUser(authService.getCurrentUser());
+        product.get().setPrice(productDto.getPrice());
+        product.get().setQuantity(productDto.getQuantity());
+        product.get().setName(productDto.getName());
+        product.get().setImageUrl(imageUrl);
+        productRepository.save(product.get());
+        return imageUrl;
+    }
+
+
     private File convertMultiPartFileToFile(MultipartFile file) throws IOException {
         File convertedFile = new File(file.getOriginalFilename());
         FileOutputStream fos = new FileOutputStream(convertedFile);

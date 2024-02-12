@@ -33,6 +33,19 @@ public class ProductController {
         return new ResponseEntity<>("Product Added Successfully", HttpStatus.CREATED);
     }
 
+    @RequestMapping(value = "/upload/{categoryId}/{productId}",
+            method = RequestMethod.PUT,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateProduct(@RequestPart("image") MultipartFile image,
+                                                      @RequestParam("name") String name, @RequestParam("price") Integer price,
+                                                      @RequestParam("quantity") Integer quantity,
+                                                      @PathVariable Long categoryId,
+                                                      @PathVariable Long productId ) throws IOException {
+        ProductDto productDto = new ProductDto(name, price, quantity);
+        String imageUrl = productService.updateProduct(image, productDto, categoryId, productId);
+        return new ResponseEntity<>("Product Updated Successfully", HttpStatus.CREATED);
+    }
+
     @GetMapping("/all")
     public List<Product> getAll() {
         return productService.getAllProducts();

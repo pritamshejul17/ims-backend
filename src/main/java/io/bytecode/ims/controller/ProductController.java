@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@CrossOrigin (origins = "http://localhost:3000")
 @RequestMapping("/api/products")
 public class ProductController {
 
@@ -52,8 +53,24 @@ public class ProductController {
     }
 
     @GetMapping("/all/{categoryId}")
+
     public List<Product> getAllProductsByCategory(@PathVariable Long categoryId) {
         return productService.getAllProductsByCategory(categoryId);
+    }
+
+    @PutMapping("/update/{categoryId}/{productId}")
+    public ResponseEntity<String> updateProduct2(@RequestParam String name, @RequestParam Integer quantity,
+                                                 @RequestParam  Integer price, @PathVariable Long categoryId,
+                                                 @PathVariable Long productId) {
+        ProductDto productDto = new ProductDto(name, price, quantity);
+        String response = productService.updateProduct2(productDto, categoryId, productId);
+        return new ResponseEntity<>("Product Updated Successfully", HttpStatus.OK);
+    }
+
+
+    @GetMapping("/{productId}")
+    public Product getProductById(@PathVariable Long productId){
+        return productService.findByProductId(productId);
     }
 
     @DeleteMapping("/{id}")

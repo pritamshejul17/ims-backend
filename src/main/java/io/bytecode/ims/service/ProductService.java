@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +41,11 @@ public class ProductService {
         return imageUrl;
     }
 
+    public Product findByProductId(Long productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        return product.orElseThrow(() -> new SpringImsException("Product Not found "));
+    }
+
     public String updateProduct(MultipartFile imageFile, ProductDto productDto, Long categoryId, Long productId) throws IOException {
         Optional<Category> category = categoryRepository.findById(categoryId);
         File file = convertMultiPartFileToFile(imageFile);
@@ -54,6 +60,18 @@ public class ProductService {
         productRepository.save(product.get());
         return imageUrl;
     }
+
+    public String updateProduct2(ProductDto productDto, Long categoryId, Long productId) {
+//        Optional<Category> category = categoryRepository.findById(categoryId);
+        Optional<Product> product = productRepository.findById(productId);
+        product.get().setName(productDto.getName());
+        product.get().setPrice(productDto.getPrice());
+        product.get().setQuantity(productDto.getQuantity());
+        productRepository.save(product.get());
+        return "Product Updated Successfully";
+
+    }
+
 
 
     private File convertMultiPartFileToFile(MultipartFile file) throws IOException {

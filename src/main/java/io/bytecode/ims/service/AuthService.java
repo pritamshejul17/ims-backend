@@ -51,6 +51,10 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setCreated(Instant.now());
         user.setEnabled(false);
+        if (userDto.getRole().equals("admin"))
+            user.setRole("ROLE_ADMIN");
+        else
+            user.setRole("ROLE_USER");
 
         userRepository.save(user);
 
@@ -88,6 +92,8 @@ public class AuthService {
     public User getCurrentUser() {
         Jwt principal = (Jwt) SecurityContextHolder.
                 getContext().getAuthentication().getPrincipal();
+        System.out.println(userRepository.findByUsername(principal.getSubject().toString())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject())));
         return userRepository.findByUsername(principal.getSubject())
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject()));
     }
